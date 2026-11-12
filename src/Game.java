@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.random.RandomGenerator;
+import java.util.regex.Pattern;
 
 public class Game {
     private static final String PATH = "Words.txt";
@@ -48,6 +49,7 @@ public class Game {
     }
     private void playGame()
     {
+        final Pattern CYRILLIC = Pattern.compile("\\p{IsCyrillic}+");
         final String CONGRATULATIONS = "Поздравляю! Вы победили!!!";
         final String LOOS = "Вы потратили все попытки.";
 
@@ -61,6 +63,7 @@ public class Game {
         try
         {
             word = getWord();
+            word = word.toLowerCase();
             inputWord = new char[word.length()];
             Arrays.fill(inputWord,'_');
         }
@@ -78,10 +81,12 @@ public class Game {
         {
 
             drawHangman(errors);
-            IO.println(new String(inputWord));
+            IO.println("\n\n\n\n");
+            IO.println(" " + new String(inputWord));
             String inputLetter = IO.readln();
             char letter = ' ';
-            if(inputLetter.length() == 1 && Character.isLetter(inputLetter.charAt(0))) letter = inputLetter.charAt(0);
+            if(inputLetter.length() == 1 && CYRILLIC.matcher(inputLetter).matches()) letter = Character.toLowerCase(inputLetter.charAt(0));
+            else continue;
             if(!wordLetters.contains(letter) && !wrongLetters.contains(letter)) {
                 errors++;
                 wrongLetters.add(letter);
@@ -107,7 +112,7 @@ public class Game {
         if(errors == 6 || win == false)
         {
 
-            IO.println(LOOS + " Слово: \""+ word + "\", у вас \"" + claims + "\" очков!");
+            IO.println(LOOS + " Слово: \""+ word + "\".");
         }
         else
         {
