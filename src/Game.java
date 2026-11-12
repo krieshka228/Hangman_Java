@@ -6,10 +6,14 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.random.RandomGenerator;
-import java.util.regex.Pattern;
 
 public class Game {
     private static final String PATH = "Words.txt";
+    private boolean isCyrillic(char symbol)
+    {
+        int code = (int) symbol;
+        return (code > 1040 && code < 1103) || code == 1025 || code == 1105;
+    }
     private void drawHangman(int errors)
     {
         IO.print("\033[H\033[2J");
@@ -49,7 +53,6 @@ public class Game {
     }
     private void playGame()
     {
-        final Pattern CYRILLIC = Pattern.compile("\\p{IsCyrillic}+");
         final String CONGRATULATIONS = "Поздравляю! Вы победили!!!";
         final String LOOS = "Вы потратили все попытки.";
 
@@ -85,7 +88,7 @@ public class Game {
             IO.println(" " + new String(inputWord));
             String inputLetter = IO.readln();
             char letter = ' ';
-            if(inputLetter.length() == 1 && CYRILLIC.matcher(inputLetter).matches()) letter = Character.toLowerCase(inputLetter.charAt(0));
+            if(inputLetter.length() == 1 && isCyrillic(inputLetter.charAt(0))) letter = Character.toLowerCase(inputLetter.charAt(0));
             else continue;
             if(!wordLetters.contains(letter) && !wrongLetters.contains(letter)) {
                 errors++;
