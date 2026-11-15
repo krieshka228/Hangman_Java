@@ -9,18 +9,28 @@ import java.util.random.RandomGenerator;
 
 public class Game {
     private static final String PATH = "Words.txt";
-    private static final String LOOS = "Вы потратили все попытки.";
+    private static final String LOSE = "Вы потратили все попытки.";
     private static final String CONGRATULATIONS = "Поздравляю! Вы победили!!!";
+    private static final String START_GAME = "1";
+    private static final String QUIT_GAME = "2";
+    private static final String MAIN_MENU_CHOICE ="""
+            ====ВИСЕЛИЦА====
+            %s. Начать игру
+            %s. Выйти""".formatted(START_GAME, QUIT_GAME);
+    private static final String INPUT_LETTER_TEXT = "Введите букву: ";
     private int errors;
     private  Set<Character> targetLetters = new HashSet<>();
     private Set<Character> wrongLetters = new HashSet<>();
 
-
+    private boolean isLose()
+    {
+        return errors == 6;
+    }
     public void start()
     {
         openMainMenu();
     }
-    private void handleGuess(char inputLetter, String targetWord, char[] inputWord)
+    private void handleGuess(char inputLetter, String targetWord, char[] mask)
     {
         if(isNotCorrectLetter(inputLetter)) {
             wrongLetters.add(inputLetter);
@@ -30,15 +40,14 @@ public class Game {
         {
             for(int i = 0; i < targetWord.length(); i++)
             {
-                if(targetWord.charAt(i) == inputLetter) inputWord[i] = inputLetter;
+                if(targetWord.charAt(i) == inputLetter) mask[i] = inputLetter;
             }
         }
     }
-    private void renderGameState(char[] inputWord)
+    private void renderGameState(char[] mask)
     {
-        drawHangman();
-        IO.println("\n\n\n\n");
-        IO.println(" " + new String(inputWord));
+        HangmanRenderer.drawHangman(errors);
+        IO.println(" " + new String(mask));
     }
     private void addLettersInSet(String targetWord)
     {
@@ -47,33 +56,28 @@ public class Game {
             targetLetters.add(targetWord.charAt(i));
         }
     }
-    private void playRound(String targetWord, char[] inputWord)
+    private void playRound(String targetWord, char[] mask)
     {
-        while(!isWin(targetWord, inputWord) && errors < 6)
-        {
+        do {
             char inputLetter;
             String input;
 
-            renderGameState(inputWord);
-
-            input = IO.readln();
+            renderGameState(mask);
+            input = IO.readln(INPUT_LETTER_TEXT);
 
             if(isValidLetter(input)) { inputLetter = Character.toLowerCase(input.charAt(0)); }
             else { continue; }
 
-            handleGuess(inputLetter, targetWord, inputWord);
+            handleGuess(inputLetter, targetWord, mask);
         }
+        while(!isWin(targetWord, mask) && !isLose());
+        renderGameState(mask);
     }
-    private void clearConsole()
+    private void writeResult(String targetWord, char[] mask)
     {
-        IO.print("\033[H\033[2J");
-        System.out.flush();
-    }
-    private void writeResult(String targetWord, char[] inputWord)
-    {
-        if(errors == 6 || !isWin(targetWord, inputWord))
+        if(errors == 6 || !isWin(targetWord, mask))
         {
-            System.out.printf(LOOS + " Слово: \""+ targetWord + "\".");
+            System.out.printf(LOSE + " Слово: \""+ targetWord + "\".");
         }
         else
         {
@@ -81,12 +85,12 @@ public class Game {
             System.out.printf(CONGRATULATIONS+" Слово: \""+ targetWord + "\", у вас "+ claims + " очков!" );
         }
     }
-    private boolean isWin(String targetWord, char[] inputWord)
+    private boolean isWin(String targetWord, char[] mask)
     {
         boolean win = false;
         for(int i = 0; i < targetWord.length(); i++)
         {
-            if(inputWord[i] == targetWord.charAt(i)) win = true;
+            if(mask[i] == targetWord.charAt(i)) win = true;
             else
             {
                 win = false;
@@ -101,25 +105,13 @@ public class Game {
     }
     private boolean isValidLetter(String letter)
     {
-        return letter.length() == 1 && isCyrillic(letter.charAt(0));
+        return letter.length() == 1 && isRussian(letter.charAt(0));
 
     }
-    private boolean isCyrillic(char symbol)
+    private boolean isRussian(char symbol)
     {
         int code = (int) symbol;
-        return (code >= 1040 && code <= 1103) || code == 1025 || code == 1105;
-    }
-    private void drawHangman()
-    {
-        clearConsole();
-        IO.println(" +---+");
-        if(errors >= 0) IO.println(" |   |");
-        if(errors >= 1) IO.println(" 0   |");
-        if(errors == 2) IO.println(" |");
-        else if(errors == 3) IO.println("/|");
-        else if(errors > 3) IO.println("/|\\");
-        if(errors == 5) IO.println("/");
-        else if(errors == 6) IO.println("/\\");
+        return (code >= 'А' && code <= 'я') || code == 'ё' || code == 'Ё';
     }
     private String getWord() throws IOException{
         String text = Files.readString(Path.of(PATH), StandardCharsets.UTF_8);
@@ -129,33 +121,34 @@ public class Game {
     private void openMainMenu()
     {
         String choice = "";
-        final String MAIN_MENU_CHOICE = "====ВИСЕЛИЦА====\n1. Начать игру\n2. Выйти";
-        final String START_GAME = "1";
-        final String QUIT_GAME = "2";
         while(!choice.equals(QUIT_GAME))
         {
+            IO.println();
             choice = IO.readln(MAIN_MENU_CHOICE);
             switch(choice)
             {
                 case START_GAME:
-                    playGame();
+                    play();
                     break;
                 case QUIT_GAME:
+                    break;
+                default:
+                    IO.println("Такого варианта нет. Введите ещё раз!");
                     break;
             }
         }
     }
-    private void playGame()
+    private void play()
     {
 
         String targetWord;
-        char[] inputWord;
+        char[] mask;
 
         try
         {
             targetWord = getWord().toLowerCase();
-            inputWord = new char[targetWord.length()];
-            Arrays.fill(inputWord,'_');
+            mask = new char[targetWord.length()];
+            Arrays.fill(mask,'_');
         }
         catch (IOException e)
         {
@@ -169,9 +162,10 @@ public class Game {
         errors = 0;
 
         addLettersInSet(targetWord);
-        playRound(targetWord, inputWord);
-        writeResult(targetWord, inputWord);
+        playRound(targetWord, mask);
+        writeResult(targetWord, mask);
     }
+
 
 
 }
