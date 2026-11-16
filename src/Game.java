@@ -25,10 +25,23 @@ public class Game {
     private static final String LOSE_TEXT = "%s Слово: \"%s\".%n";
     private static final String WIN_TEXT = "%s  Слово: \"%s\", у вас %s очков!%n";
     private static final char MASK_CHAR = '_';
+    private static final String ALPHABET = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
     private int errors;
     private Set<Character> targetLetters = new HashSet<>();
     private Set<Character> wrongLetters = new HashSet<>();
+    private Set<Character> enteredLetters = new HashSet<>();
 
+    private void writeLetters()
+    {
+        for(char i : ALPHABET.toCharArray())
+        {
+            if(!enteredLetters.contains(i))
+            {
+                System.out.print(i + " ");
+            }
+        }
+        System.out.println();
+    }
     private boolean isLose() {
         return errors == MAX_ERRORS;
     }
@@ -39,9 +52,11 @@ public class Game {
 
     private void handleGuess(char inputLetter, String targetWord, char[] mask) {
         if (isNotCorrectLetter(inputLetter)) {
+            enteredLetters.add(inputLetter);
             wrongLetters.add(inputLetter);
             errors++;
         } else {
+            enteredLetters.add(inputLetter);
             for (int i = 0; i < targetWord.length(); i++) {
                 if (targetWord.charAt(i) == inputLetter) mask[i] = inputLetter;
             }
@@ -50,6 +65,7 @@ public class Game {
 
     private void renderGameState(char[] mask) {
         HangmanRenderer.drawHangman(errors);
+        writeLetters();
         IO.println(" " + new String(mask));
     }
 
@@ -79,7 +95,7 @@ public class Game {
 
             handleGuess(inputLetter, targetWord, mask);
         }
-        while (!isWin(targetWord, mask) && !isLose());
+        while (!isGameOver(targetWord, mask));
         renderGameState(mask);
     }
 
