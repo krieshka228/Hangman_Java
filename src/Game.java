@@ -34,6 +34,7 @@ public class Game {
     private static final char CYRILLIC_YA = 'я';
     private static final char CYRILLIC_IO_UPPER = 'Ё';
     private static final char CYRILLIC_IO_LOWER = 'ё';
+    private static final int LAST_INDEX_ALPHABET = ALPHABET.length() - 1;
     private int mistakes;
     private static final Scanner scanner = new Scanner(System.in);
     private Set<Character> targetLetters = new HashSet<>();
@@ -51,20 +52,19 @@ public class Game {
             System.out.println(MISTAKE_LETTER_ALREADY_ENTERED);
         }
     }
-    private void writeLetters() {
-        boolean first = true;
-        for (char letter : ALPHABET.toCharArray()) {
-            if (!enteredLetters.contains(letter)) {
-                if(first)
+    private void writeLetters()
+    {
+        for(int index = 0; index < ALPHABET.length(); index++) {
+            if (!enteredLetters.contains(ALPHABET.charAt(index))) {
+                if(index == LAST_INDEX_ALPHABET)
                 {
-                    System.out.print(letter);
+                    System.out.print(ALPHABET.charAt(index));
                 }
                 else
                 {
+                    System.out.print(ALPHABET.charAt(index));
                     System.out.print(' ');
-                    System.out.print(letter);
                 }
-                first = false;
             }
         }
         System.out.println();
@@ -85,8 +85,8 @@ public class Game {
             mistakes++;
         } else {
             enteredLetters.add(inputLetter);
-            for (int i = 0; i < targetWord.length(); i++) {
-                if (targetWord.charAt(i) == inputLetter) mask[i] = inputLetter;
+            for (int index = 0; index < targetWord.length(); index++) {
+                if (targetWord.charAt(index) == inputLetter) mask[index] = inputLetter;
             }
         }
     }
@@ -98,8 +98,8 @@ public class Game {
     }
 
     private void addLettersInSet(String targetWord) {
-        for (int i = 0; i < targetWord.length(); i++) {
-            targetLetters.add(targetWord.charAt(i));
+        for (int index = 0; index < targetWord.length(); index++) {
+            targetLetters.add(targetWord.charAt(index));
         }
     }
 
@@ -141,8 +141,8 @@ public class Game {
 
     private boolean isWin(String targetWord, char[] mask) {
         boolean win = false;
-        for (int i = 0; i < targetWord.length(); i++) {
-            if (mask[i] == targetWord.charAt(i)) win = true;
+        for (int index = 0; index < targetWord.length(); index++) {
+            if (mask[index] == targetWord.charAt(index)) win = true;
             else {
                 win = false;
                 break;
@@ -203,6 +203,7 @@ public class Game {
         mask = new char[targetWord.length()];
         Arrays.fill(mask, MASK_CHAR);
 
+        enteredLetters.clear();
         targetLetters.clear();
         wrongLetters.clear();
 
