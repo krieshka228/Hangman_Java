@@ -64,7 +64,7 @@ public class Game {
                     System.out.print(' ');
                     System.out.print(letter);
                 }
-
+                first = false;
             }
         }
         System.out.println();
