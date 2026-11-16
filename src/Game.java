@@ -68,7 +68,7 @@ public class Game {
     private void renderGameState(char[] mask) {
         HangmanRenderer.drawHangman(errors);
         writeLetters();
-        IO.println(" " + new String(mask));
+        System.out.println(" " + new String(mask));
     }
 
     private void addLettersInSet(String targetWord) {
@@ -167,7 +167,7 @@ public class Game {
                 case QUIT_GAME:
                     break;
                 default:
-                    IO.println(ERROR_MENU_MESSAGE);
+                    System.out.println(ERROR_MENU_MESSAGE);
                     break;
             }
         }
