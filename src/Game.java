@@ -20,6 +20,11 @@ public class Game {
             %s. Выйти""".formatted(START_GAME, QUIT_GAME);
     private static final String INPUT_LETTER_TEXT = "Введите букву: ";
     private static final int MAX_ERRORS = 6;
+    private static final String ERROR_MENU_MESSAGE = "Такого варианта нет. Введите ещё раз!";
+    private static final String EXEPTION_MESSAGE_GETWORD = "Не удалось прочитать файл: ";
+    private static final String LOSE_TEXT = "%s Слово: \"%s\".%n";
+    private static final String WIN_TEXT = "%s  Слово: \"%s\", у вас %s очков!%n";
+    private static final char MASK_CHAR = '_';
     private int errors;
     private Set<Character> targetLetters = new HashSet<>();
     private Set<Character> wrongLetters = new HashSet<>();
@@ -79,11 +84,11 @@ public class Game {
     }
 
     private void writeResult(String targetWord, char[] mask) {
-        if (errors == 6 || !isWin(targetWord, mask)) {
-            System.out.printf(LOSE + " Слово: \"" + targetWord + "\".");
+        if (isLose() || !isWin(targetWord, mask)) {
+            System.out.printf(LOSE_TEXT,LOSE,targetWord);
         } else {
             int claims = 6 - errors;
-            System.out.printf(CONGRATULATIONS + " Слово: \"" + targetWord + "\", у вас " + claims + " очков!");
+            System.out.printf(WIN_TEXT,CONGRATULATIONS, targetWord, claims);
         }
     }
 
@@ -123,7 +128,7 @@ public class Game {
         catch(IOException e)
 
         {
-            throw new UncheckedIOException("Не удалось прочитать файл: " + PATH, e);
+            throw new UncheckedIOException(EXEPTION_MESSAGE_GETWORD + PATH, e);
         }
 
         String[] words = text.trim().split("\\s*,\\s*");
@@ -134,7 +139,6 @@ public class Game {
         String choice = "";
         while(!choice.equals(QUIT_GAME))
         {
-            IO.println();
             choice = IO.readln(MAIN_MENU_CHOICE);
             switch(choice)
             {
@@ -144,7 +148,7 @@ public class Game {
                 case QUIT_GAME:
                     break;
                 default:
-                    IO.println("Такого варианта нет. Введите ещё раз!");
+                    IO.println(ERROR_MENU_MESSAGE);
                     break;
             }
         }
@@ -157,7 +161,7 @@ public class Game {
 
         targetWord = getWord().toLowerCase();
         mask = new char[targetWord.length()];
-        Arrays.fill(mask,'_');
+        Arrays.fill(mask,MASK_CHAR);
 
         targetLetters.clear();
         wrongLetters.clear();
