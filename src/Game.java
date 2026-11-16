@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.random.RandomGenerator;
 
@@ -19,7 +20,7 @@ public class Game {
             %s. Начать игру
             %s. Выйти""".formatted(START_GAME, QUIT_GAME);
     private static final String INPUT_LETTER_TEXT = "Введите букву: ";
-    private static final int MAX_ERRORS = 6;
+    private static final int MAX_MISTAKES = 6;
     private static final String ERROR_MENU_MESSAGE = "Такого варианта нет. Введите ещё раз!";
     private static final String EXEPTION_MESSAGE_GETWORD = "Не удалось прочитать файл: ";
     private static final String LOSE_TEXT = "%s Слово: \"%s\".%n";
@@ -28,7 +29,8 @@ public class Game {
     private static final String ALPHABET = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
     private static final String ERROR_NOT_VALID_LETTER = "Ошибка. Вы ввели не русскую букву!!!";
     private static final String REGEX = "\\s*\\R\\s*";
-    private int errors;
+    private int mistakes;
+    private static final Scanner scanner = new Scanner(System.in);
     private Set<Character> targetLetters = new HashSet<>();
     private Set<Character> wrongLetters = new HashSet<>();
     private Set<Character> enteredLetters = new HashSet<>();
@@ -45,7 +47,7 @@ public class Game {
         System.out.println();
     }
     private boolean isLose() {
-        return errors == MAX_ERRORS;
+        return mistakes == MAX_MISTAKES;
     }
 
     public void start() {
@@ -56,7 +58,7 @@ public class Game {
         if (isNotCorrectLetter(inputLetter)) {
             enteredLetters.add(inputLetter);
             wrongLetters.add(inputLetter);
-            errors++;
+            mistakes++;
         } else {
             enteredLetters.add(inputLetter);
             for (int i = 0; i < targetWord.length(); i++) {
@@ -66,7 +68,7 @@ public class Game {
     }
 
     private void renderGameState(char[] mask) {
-        HangmanRenderer.drawHangman(errors);
+        HangmanRenderer.drawHangman(mistakes);
         writeLetters();
         System.out.println(" " + new String(mask));
     }
@@ -87,7 +89,8 @@ public class Game {
             String input;
 
             renderGameState(mask);
-            input = IO.readln(INPUT_LETTER_TEXT);
+            System.out.println(INPUT_LETTER_TEXT);
+            input = scanner.nextLine();
 
             if (isValidLetter(input)) {
                 inputLetter = Character.toLowerCase(input.charAt(0));
@@ -106,7 +109,7 @@ public class Game {
         if (isLose() || !isWin(targetWord, mask)) {
             System.out.printf(LOSE_TEXT,LOSE,targetWord);
         } else {
-            int claims = 6 - errors;
+            int claims = 6 - mistakes;
             System.out.printf(WIN_TEXT,CONGRATULATIONS, targetWord, claims);
         }
     }
@@ -158,7 +161,8 @@ public class Game {
         String choice = "";
         while(!choice.equals(QUIT_GAME))
         {
-            choice = IO.readln(MAIN_MENU_CHOICE);
+            System.out.println(MAIN_MENU_CHOICE);
+            choice = scanner.nextLine();
             switch(choice)
             {
                 case START_GAME:
@@ -185,7 +189,7 @@ public class Game {
         targetLetters.clear();
         wrongLetters.clear();
 
-        errors = 0;
+        mistakes = 0;
 
         addLettersInSet(targetWord);
         playRound(targetWord, mask);
