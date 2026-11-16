@@ -53,16 +53,16 @@ public class Game {
     }
     private void writeLetters() {
         boolean first = true;
-        for (char i : ALPHABET.toCharArray()) {
-            if (!enteredLetters.contains(i)) {
+        for (char letter : ALPHABET.toCharArray()) {
+            if (!enteredLetters.contains(letter)) {
                 if(first)
                 {
-                    System.out.print(i);
+                    System.out.print(letter);
                 }
                 else
                 {
                     System.out.print(' ');
-                    System.out.print(i);
+                    System.out.print(letter);
                 }
 
             }
