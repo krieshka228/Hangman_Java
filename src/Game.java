@@ -27,7 +27,8 @@ public class Game {
     private static final String WIN_TEXT = "%s  Слово: \"%s\", у вас %s очков!%n";
     private static final char MASK_CHAR = '_';
     private static final String ALPHABET = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
-    private static final String ERROR_NOT_VALID_LETTER = "Ошибка. Вы ввели не русскую букву!!!";
+    private static final String MISTAKE_NOT_VALID_LETTER = "Ошибка. Некорректный ввод!";
+    private static final String MISTAKE_LETTER_ALREADY_ENTERED = "Вы уже вводили эту букву!";
     private static final String REGEX = "\\s*\\R\\s*";
     private static final char CYRILLIC_A = 'А';
     private static final char CYRILLIC_YA = 'я';
@@ -39,17 +40,36 @@ public class Game {
     private Set<Character> wrongLetters = new HashSet<>();
     private Set<Character> enteredLetters = new HashSet<>();
 
-    private void writeLetters()
+    private boolean isLetterAlreadyEntered(char letter)
     {
-        for(char i : ALPHABET.toCharArray())
+        return enteredLetters.contains(letter);
+    }
+    private void writeLetterAlreadyEntered(char letter)
+    {
+        if(isLetterAlreadyEntered(letter))
         {
-            if(!enteredLetters.contains(i))
-            {
-                System.out.print(i + " ");
+            System.out.println(MISTAKE_LETTER_ALREADY_ENTERED);
+        }
+    }
+    private void writeLetters() {
+        boolean first = true;
+        for (char i : ALPHABET.toCharArray()) {
+            if (!enteredLetters.contains(i)) {
+                if(first)
+                {
+                    System.out.print(i);
+                }
+                else
+                {
+                    System.out.print(' ');
+                    System.out.print(i);
+                }
+
             }
         }
         System.out.println();
     }
+
     private boolean isLose() {
         return mistakes == MAX_MISTAKES;
     }
@@ -95,11 +115,12 @@ public class Game {
             renderGameState(mask);
             System.out.println(INPUT_LETTER_TEXT);
             input = scanner.nextLine();
-
             if (isValidLetter(input)) {
                 inputLetter = Character.toLowerCase(input.charAt(0));
-            } else {
-                System.out.println(ERROR_NOT_VALID_LETTER);
+                writeLetterAlreadyEntered(inputLetter);
+            } else
+            {
+                System.out.println(MISTAKE_NOT_VALID_LETTER);
                 continue;
             }
 
@@ -111,10 +132,10 @@ public class Game {
 
     private void writeResult(String targetWord, char[] mask) {
         if (isLose() || !isWin(targetWord, mask)) {
-            System.out.printf(LOSE_TEXT,LOSE,targetWord);
+            System.out.printf(LOSE_TEXT, LOSE, targetWord);
         } else {
             int claims = 6 - mistakes;
-            System.out.printf(WIN_TEXT,CONGRATULATIONS, targetWord, claims);
+            System.out.printf(WIN_TEXT, CONGRATULATIONS, targetWord, claims);
         }
     }
 
@@ -139,36 +160,28 @@ public class Game {
 
     }
 
-    private boolean isRussian(char symbol)
-    {
-        return (symbol >= CYRILLIC_A && symbol <= CYRILLIC_YA) || symbol == CYRILLIC_IO_LOWER || symbol == CYRILLIC_IO_LOWER;
+    private boolean isRussian(char symbol) {
+        return (symbol >= CYRILLIC_A && symbol <= CYRILLIC_YA) || symbol == CYRILLIC_IO_LOWER || symbol == CYRILLIC_IO_UPPER;
     }
 
-    private String getWord()
-    {
+    private String getWord() {
         String text;
-        try
-        {
-             text = Files.readString(Path.of(PATH), StandardCharsets.UTF_8);
-        }
-        catch(IOException e)
-
-        {
+        try {
+            text = Files.readString(Path.of(PATH), StandardCharsets.UTF_8);
+        } catch (IOException e) {
             throw new UncheckedIOException(EXEPTION_MESSAGE_GETWORD + PATH, e);
         }
 
         String[] words = text.trim().split(REGEX);
         return words[RandomGenerator.getDefault().nextInt(words.length)];
-}
-    private void openMainMenu()
-    {
+    }
+
+    private void openMainMenu() {
         String choice = "";
-        while(!choice.equals(QUIT_GAME))
-        {
+        while (!choice.equals(QUIT_GAME)) {
             System.out.println(MAIN_MENU_CHOICE);
             choice = scanner.nextLine();
-            switch(choice)
-            {
+            switch (choice) {
                 case START_GAME:
                     play();
                     break;
@@ -180,15 +193,15 @@ public class Game {
             }
         }
     }
-    private void play()
-    {
+
+    private void play() {
 
         String targetWord;
         char[] mask;
 
         targetWord = getWord().toLowerCase();
         mask = new char[targetWord.length()];
-        Arrays.fill(mask,MASK_CHAR);
+        Arrays.fill(mask, MASK_CHAR);
 
         targetLetters.clear();
         wrongLetters.clear();
@@ -199,7 +212,6 @@ public class Game {
         playRound(targetWord, mask);
         writeResult(targetWord, mask);
     }
-
 
 
 }
