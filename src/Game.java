@@ -26,6 +26,8 @@ public class Game {
     private static final String WIN_TEXT = "%s  Слово: \"%s\", у вас %s очков!%n";
     private static final char MASK_CHAR = '_';
     private static final String ALPHABET = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+    private static final String ERROR_NOT_VALID_LETTER = "Ошибка. Вы ввели не русскую букву!!!";
+    private static final String REGEX = "\\s*\\R\\s*";
     private int errors;
     private Set<Character> targetLetters = new HashSet<>();
     private Set<Character> wrongLetters = new HashSet<>();
@@ -90,6 +92,7 @@ public class Game {
             if (isValidLetter(input)) {
                 inputLetter = Character.toLowerCase(input.charAt(0));
             } else {
+                System.out.println(ERROR_NOT_VALID_LETTER);
                 continue;
             }
 
@@ -147,7 +150,7 @@ public class Game {
             throw new UncheckedIOException(EXEPTION_MESSAGE_GETWORD + PATH, e);
         }
 
-        String[] words = text.trim().split("\\s*,\\s*");
+        String[] words = text.trim().split(REGEX);
         return words[RandomGenerator.getDefault().nextInt(words.length)];
 }
     private void openMainMenu()
