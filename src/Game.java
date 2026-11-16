@@ -29,6 +29,10 @@ public class Game {
     private static final String ALPHABET = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
     private static final String ERROR_NOT_VALID_LETTER = "Ошибка. Вы ввели не русскую букву!!!";
     private static final String REGEX = "\\s*\\R\\s*";
+    private static final char CYRILLIC_A = 'А';
+    private static final char CYRILLIC_YA = 'я';
+    private static final char CYRILLIC_IO_UPPER = 'Ё';
+    private static final char CYRILLIC_IO_LOWER = 'ё';
     private int mistakes;
     private static final Scanner scanner = new Scanner(System.in);
     private Set<Character> targetLetters = new HashSet<>();
@@ -70,7 +74,7 @@ public class Game {
     private void renderGameState(char[] mask) {
         HangmanRenderer.drawHangman(mistakes);
         writeLetters();
-        System.out.println(" " + new String(mask));
+        System.out.println(mask);
     }
 
     private void addLettersInSet(String targetWord) {
@@ -137,7 +141,7 @@ public class Game {
 
     private boolean isRussian(char symbol)
     {
-        return (symbol >= 'А' && symbol <= 'я') || symbol == 'ё' || symbol == 'Ё';
+        return (symbol >= CYRILLIC_A && symbol <= CYRILLIC_YA) || symbol == CYRILLIC_IO_LOWER || symbol == CYRILLIC_IO_LOWER;
     }
 
     private String getWord()
