@@ -108,9 +108,9 @@ public class Game {
 
     }
 
-    private boolean isRussian(char symbol) {
-        int code = (int) symbol;
-        return (code >= 'А' && code <= 'я') || code == 'ё' || code == 'Ё';
+    private boolean isRussian(char symbol)
+    {
+        return (symbol >= 'А' && symbol <= 'я') || symbol == 'ё' || symbol == 'Ё';
     }
 
     private String getWord()
