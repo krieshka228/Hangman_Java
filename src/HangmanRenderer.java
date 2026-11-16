@@ -55,11 +55,11 @@ public class HangmanRenderer {
     public static void drawHangman(int errors)
     {
         clearConsole();
-        IO.println(DRAWINGS[errors]);
+        System.out.println(DRAWINGS[errors]);
     }
     private static void clearConsole()
     {
-        IO.print(CLEAR_BYTES);
+        System.out.print(CLEAR_BYTES);
         System.out.flush();
     }
 }
